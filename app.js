@@ -70,9 +70,21 @@ appclass = {
 		return this.__renderBefore(this.template(this.data(data)));
 	},
 
+	mock: function(){
+		var mock = require('mock').mock;
+		var data = require(this.name + '/' + this.name + '.json');
+		return mock(data);
+	},
+
 	// 返回组合数据
 	data: function(data){
-		return $.extend({UI: this.ui}, this.mock, data || {})
+		if(config.env === 'online'){
+			return data;
+		};
+
+		if(config.env === 'mock' || config.env === 'mockjs'){
+			return $.extend({UI: this.ui}, this.mock(), data || {})
+		};
 	},
 
 	// 对返回的合成数据进行预处理
