@@ -17,13 +17,12 @@ nav
 
 ```
 // 基本使用，定义一个 aimee-app
-var app, moc;
+var app, App;
 
-moc = require('mock').mock;
-app = require('app').define({
+App = require('app');
+app = App.define({
 	name: 'nav',
 	version: '1.0.0',
-	mock: moc(require('./nav.json')),
 	template: require('./nav.jade')
 });
 
@@ -33,13 +32,12 @@ module.exports = app;
 
 ```
 // 高级使用，定义一个 aimee-app
-var app, moc;
+var app, App;
 
-moc = require('mock').mock;
-app = require('app').define({
+App = require('app');
+app = App.define({
 	name: 'nav',
 	version: '1.0.0',
-	mock: moc(require('./nav.json')),
 	template: require('./nav.jade'),
 
 	// app渲染到页面之前执行，用于预处理渲染内容
