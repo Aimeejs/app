@@ -1,4 +1,4 @@
-var app, APP, appclass, guid = require('guid');
+var app, APP, appclass, types, guid = require('guid');
 
 app = {
 	name: 'app',
@@ -7,9 +7,18 @@ app = {
 	homepage: 'https://github.com/gavinning/aimee-app'
 };
 
+// 事件类型
+types = 'blur focus focusin focusout load resize scroll unload click dblclick ' +
+		'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
+		'change select submit keydown keypress keyup error contextmenu'.split( );
+
 appclass = {
 	extend: function(){
 		$.extend.apply(null, [this].concat([].slice.call(arguments, 0)))
+	},
+
+	element: function(){
+		return $('#' + this.ui.id);
 	},
 
 	// 设置组件皮肤
@@ -79,7 +88,7 @@ appclass = {
 	// 返回组合数据
 	data: function(data){
 		if(config.env === 'online'){
-			return data;
+			return $.extend({UI: this.ui}, data || {});
 		};
 
 		if(config.env === 'mock' || config.env === 'mockjs'){
@@ -108,24 +117,39 @@ appclass = {
 		return this;
 	},
 
+	find: function(selector){
+		return this.element().find(selector)
+	},
+
+	delegate: function(el, type, fn){
+		this.element().delegate(el, type, fn);
+		return this;
+	},
+
 	// 监听事件
 	on: function(id, fn){
-		this.__EventMap[id] ? '' : this.__EventMap[id] = [];
-		this.__EventMap[id].push(fn);
+		if(types.indexOf(id) >= 0){
+			this.element().on(id, fn);
+			return this;
+
+		} else {
+			this.__EventMap ? '' : this.__EventMap = {};
+			this.__EventMap[id] ? '' : this.__EventMap[id] = [];
+			this.__EventMap[id].push(fn);
+			return this;
+		}
 	},
 
 	// 取消监听
 	off: function(id){
 		this.__EventMap[id] = [];
+		return this;
 	},
-
-	// 事件Map
-	__EventMap: {},
 
 	// 组件渲染之前 预处理
 	__renderBefore: function(data){
 		data = this.preprocess(data);
-		!this.__EventMap.before || this.__EventMap.before.forEach(function(fn){
+		!this.__EventMap || !this.__EventMap.before || this.__EventMap.before.forEach(function(fn){
 			data = fn(data)
 		});
 		return data;
@@ -135,7 +159,7 @@ appclass = {
 	__renderAfter: function(){
 		var widget = $('#' + this.attr('id'));
 		this.postprocess(widget);
-		!this.__EventMap.after || this.__EventMap.after.forEach(function(fn){
+		!this.__EventMap || !this.__EventMap.after || this.__EventMap.after.forEach(function(fn){
 			fn(widget)
 		});
 	}
