@@ -12,10 +12,6 @@ Class = aimee.Class;
 
 App = Class.create();
 App.version = '1.0.0';
-App.aimee = {
-    app: true,
-    widget: true
-};
 
 // 事件类型
 types = ['before', 'after'];
@@ -149,6 +145,7 @@ App.fn.extend({
 
     // 设置模块皮肤
     skin: function(className){
+        if(className)
         this.addClass('skin-' + className);
         return this;
     },
