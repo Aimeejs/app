@@ -30,8 +30,22 @@ App.extend({
 
     // 返回组合数据
     data: function(data){
-        return config.env === 'mock' || config.env === 'mockjs' ?
-            $.extend(app.getMockData(), data || {}) : data;
+        // 无数据默认返回MockData
+        if(!data){
+            return app.getMockData();
+        }
+
+        // 非Map类型直接返回
+        if(!$.isPlainObject(data)){
+            return data;
+        }
+
+        // data && $.isPlainObject(data) &
+        if(config.env === 'mock' || config.env === 'mockjs'){
+            return $.extend(app.getMockData(), data)
+        }
+
+        return data;
     },
 
     // 返回renderId
@@ -46,7 +60,7 @@ App.extend({
         };
 
         // 渲染前预处理
-        this.prerender(app.getApp());
+        this.prerender();
 
         if(!type){
             // 执行渲染
@@ -66,7 +80,7 @@ App.extend({
         }
 
         // 渲染后处理
-        this.postrender(app.getApp());
+        this.postrender();
     },
 
     // 组件渲染预处理，内部使用
@@ -81,35 +95,41 @@ App.extend({
     },
 
     // 组件渲染之预处理
-    prerender: function(thisApp){
-        this.__prerender(thisApp);
-        app.prerender(thisApp);
-        !app.__EventMap || !app.__EventMap.before || app.__EventMap.before.forEach(function(fn){
-            fn(thisApp)
+    prerender: function(){
+        this.__prerender(app);
+        app.include(app);
+        app.prerender(app);
+        !app.__EventMap ||
+        !app.__EventMap.before ||
+        app.__EventMap.before.forEach(function(fn){
+            fn(app)
         });
     },
 
     // 组件渲染之后处理
-    postrender: function(thisApp){
-        this.__postrender(thisApp);
-        app.postrender(thisApp);
-        !app.__EventMap || !app.__EventMap.after || app.__EventMap.after.forEach(function(fn){
-            fn(thisApp)
+    postrender: function(){
+        this.__postrender(app);
+        app.bind(app);
+        app.postrender(app);
+        !app.__EventMap ||
+        !app.__EventMap.after ||
+        app.__EventMap.after.forEach(function(fn){
+            fn(app)
         });
     }
 });
 
 App.fn.extend({
-    init: function(data){
-        this.compile(data);
+    init: function(data, noMock){
+        this.compile(data, noMock);
         return this;
     },
 
     // 执行数据模板编译
-    compile: function(data){
+    compile: function(data, noMock){
         app = this;
         // 缓存数据
-        this._data = App.data(data);
+        this._data = noMock ? data : App.data(data);
         // 缓存app.jquery对象
         this._app = $(this.template(this.getData()));
         return this;
@@ -209,18 +229,23 @@ App.fn.extend({
         return this.getApp().find(selector);
     },
 
-    // 对返回的合成数据进行预处理
-    prerender: function(thisApp){
+    // 标准扩展处理
+    include: function(app){
         return this;
     },
 
-    // app渲染之后
-    postrender: function(thisApp){
+    // 标准预处理
+    prerender: function(app){
         return this;
     },
 
-    // 类的事件，可选，调用方式：app.bind();
-    bind: function(){
+    // 标准后处理
+    postrender: function(app){
+        return this;
+    },
+
+    // 标准事件绑定处理
+    bind: function(app){
         return this;
     },
 
