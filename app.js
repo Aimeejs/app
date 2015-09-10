@@ -14,7 +14,7 @@ App = Class.create();
 App.version = '1.0.0';
 
 // 事件类型
-types = ['before', 'after'];
+types = ['before', 'after', 'data'];
 
 App.fn.extend({
     renderString: 'lincoapp-id-',
@@ -60,7 +60,7 @@ App.extend({
         };
 
         // 渲染前预处理
-        this.prerender();
+        this.prerender(this);
 
         if(!type){
             // 执行渲染
@@ -80,7 +80,7 @@ App.extend({
         }
 
         // 渲染后处理
-        this.postrender();
+        this.postrender(this);
     },
 
     // 组件渲染预处理，内部使用
@@ -268,6 +268,16 @@ App.fn.extend({
             this.__EventMap[id].push(fn);
             return this;
         }
+    },
+
+    fire: function(id){
+        var args = [].slice.call(arguments, 1);
+        this.__EventMap ? '' : this.__EventMap = {};
+        this.__EventMap[id] ? '' : this.__EventMap[id] = [];
+        this.__EventMap[id].forEach(function(fn){
+            fn.apply(app, args)
+        })
+        return this;
     },
 
     // 取消监听
