@@ -4,7 +4,7 @@
  * Homepage https://github.com/gavinning/aimee-app
  */
 
-var app, App, aimee, config, Class, types;
+var app, App, aimee, config, Class, types, EventMaps;
 
 aimee = require('aimee');
 config = aimee.getConfig();
@@ -15,6 +15,10 @@ App.version = '1.0.0';
 
 // 事件类型
 types = ['before', 'after', 'data'];
+// EventMaps
+EventMaps = ('blur focus focusin focusout load resize scroll unload click dblclick ' +
+    'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
+    'change select submit keydown keypress keyup error contextmenu').split(' ');
 
 App.fn.extend({
     renderString: 'lincoapp-id-',
@@ -22,13 +26,8 @@ App.fn.extend({
 });
 
 App.extend({
-    // mock: function(){
-    //     var mock = require('mock').mock;
-    //     var data = require(app.name + '/' + app.name + '.json');
-    //     return mock(data);
-    // },
 
-    // 返回组合数据
+   // 返回组合数据
     data: function(data){
         // 无数据默认返回MockData
         if(!data){
@@ -152,15 +151,14 @@ App.fn.extend({
         return this._app;
     },
 
-    // 缓存所属页面jQuery对象
+    // TODO：新版本废弃此API
     setPage: function(page){
-        this._page = page;
         return this;
     },
 
     // 返回所属页面jQuery对象
     getPage: function(){
-        return this._page;
+        return this.page._page;
     },
 
     // 设置模块皮肤
@@ -254,10 +252,17 @@ App.fn.extend({
         return this;
     },
 
+    // 传入配置文件
+    config: function(config){
+        this._config = config;
+        return this;
+    },
+
     // 监听事件
     on: function(id, fn){
         // 转发给底层框架处理
-        if(types.indexOf(id) < 0){
+        // if(types.indexOf(id) < 0){
+        if(EventMaps.indexOf(id) >= 0){
             this.getApp().on(id, fn);
             return this;
 
@@ -292,7 +297,79 @@ App.fn.extend({
             this.__EventMap[id] = [];
             return this;
         }
+    },
+
+    export: function(App, fn){
+        var thisPage;
+        var app = new App;
+        this.app ? '' : this.app = {};
+
+        // 用于简单调用模块，仅用于开发测试环境
+        if(typeof fn === 'object'){
+            thisPage = fn;
+            fn = null;
+        };
+
+        // 检查重复加载
+        if(this.app[app.guid]){
+            return console.error(app.guid + ' is exist');
+        };
+
+        // 缓存app对象到页面
+        this.app[app.name] ? '' : this.app[app.name] = [];
+        this.app[app.name].push(app);
+        // 定义get方法用于获取app实例
+        this.app[app.name].get = function(index, fn){
+            if(typeof index === 'function'){
+                fn = index;
+                index = 0;
+            }
+
+            if(typeof fn === 'function'){
+                fn.call(this[index], this[index])
+            }
+            else{
+                return this[typeof index === 'number' ? index : 0];
+            }
+        };
+
+        // 存储需要添加的属性
+        // 标记当前app在同类app数组中的位置
+        app.__attr ? '' : app.__attr = {};
+        app.__attr['data-code'] = this.app[app.name].length - 1;
+
+        // 缓存引用页面对象
+        app.page = this.page;
+
+        // 缓存父级模块
+        app.parent = this;
+
+        // 缓存pm对象
+        app.pm = this.pm;
+
+        // 没有回调时自动渲染，仅用于开发测试环境
+        fn ? fn.call(app, app) : app.init().setPage(thisPage).render();
+
+        if(!fn){
+            return app;
+        }
+    },
+
+    exports: function(id, fn){
+        // id === string
+        if(typeof id === 'string'){
+            // 多个组件调用，返回page对象
+            if(id.split(' ').length > 1){
+                this.exports(id.split(' '), fn);
+                return this;
+            }
+            // 单个组件调用返回app对象
+            else{
+                return this.export(require(id), fn);
+            }
+        }
     }
+
 });
 
 module.exports = App;

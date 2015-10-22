@@ -2,7 +2,7 @@
 	"name": "aimee-app",
 	"description": "UZ构建工具app模块，用于生成Aimee-app的类",
 	"main": "app.js",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"scripts": {
 		"test": "uz -v"
 	},
