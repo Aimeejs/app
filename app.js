@@ -164,7 +164,10 @@ App.fn.extend({
     // 设置模块皮肤
     skin: function(className){
         if(className)
-        this.addClass('skin-' + className);
+            className.split(' ').forEach(function(item){
+                this.addClass('skin-' + item)
+            }.bind(this))
+
         return this;
     },
 
@@ -242,6 +245,11 @@ App.fn.extend({
         return this;
     },
 
+    // 页面渲染后，被覆盖
+    pagerender: function(){
+
+    },
+
     // 标准事件绑定处理
     bind: function(app){
         return this;
@@ -254,8 +262,14 @@ App.fn.extend({
 
     // 传入配置文件
     config: function(config){
-        this._config = config;
+        if(config){
+            this._config = this.extend({}, this._config, config);
         return this;
+        }
+        else{
+            this._config ? '' : this._config = {};
+            return this._config;
+        }
     },
 
     // 监听事件

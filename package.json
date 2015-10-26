@@ -1,8 +1,8 @@
 {
-	"name": "aimee-app",
-	"description": "UZ构建工具app模块，用于生成Aimee-app的类",
+	"name": "app",
+	"description": "Aimeejs的app模块",
 	"main": "app.js",
-	"version": "1.0.3",
+	"version": "1.0.0",
 	"scripts": {
 		"test": "uz -v"
 	},
@@ -22,7 +22,6 @@
 	},
 	"homepage": "https://github.com/gavinning/aimee-app",
 	"dependencies": {
-		"aimee-guid": "*",
-		"aimee-class": "*"
+		"aimee": "^1.0.0"
 	}
 }
