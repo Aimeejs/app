@@ -1,7 +1,7 @@
 /**
- * Aimee-app
+ * App for Aimeejs
  * Author by gavinning
- * Homepage https://github.com/gavinning/aimee-app
+ * Homepage https://github.com/Aimeejs/app
  */
 
 var app, App, aimee, config, Class, types, EventMaps;

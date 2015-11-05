@@ -1,11 +1,10 @@
-# Aimee-app
+# app
 
-----
-UZ构建工具app模块，用于生成Aimee Widget的基类，依赖[Zepto](http://www.zeptojs.cn/) or [jQuery v2+](http://jquery.com/)，可选依赖[mock.js](http://mockjs.com/)，mockjs仅用于开发环境
+Aimee框架的app模块，所有组件依赖此模块创建
 
 
 ```
-// Aimee-widget由4个基本文件组成
+// widget.app由4个基本文件组成
 nav
 ├── nav.jade 			// app的jade模板，构建过程中会被编译成amd模块
 ├── nav.js 				// app功能js文件
@@ -15,7 +14,7 @@ nav
 ```
 
 ```
-// 基本使用，定义一个 Aimee-widget
+// 基本使用，定义一个 widget.app
 var app, App;
 
 App = require('app');
@@ -30,7 +29,7 @@ module.exports = app;
 
 
 ```
-// 高级使用，定义一个 Aimee-widget
+// 高级使用，定义一个 widget.app
 var app, App;
 
 App = require('app');
@@ -40,26 +39,22 @@ app = App.create({
 	template: require('./nav.jade'),
 
 	// app渲染到页面之前执行，用于预处理渲染内容
-	prerender: function(thisApp){
-		// thisApp 当前模块的jQuery对象
-		thisApp.find('li').eq(0).addClass('selected');
+	prerender: function(app){
+		// app为模块的实例
+		app.find('li').eq(0).addClass('selected');
 	},
 
-	// app渲染到页面之后执行
-	postrender: function(thisApp){
-		// thisApp 当前模块的jQuery对象
+	// app渲染到页面之后执行，此时app还在内存中，不能获取宽度高度等与尺寸相关的属性
+	postrender: function(app){
+		// app为模块的实例
+	},
+
+	// 页面渲染到浏览器后执行，此时可以获取宽高等与尺寸相关的属性
+	pagerender: function(app){
+		// some code
 	}
 });
 
-// app渲染之前触发，类似于prerender方法
-app.fn.on('before', function(thisApp){
-	// your code
-});
-
-// app渲染之后触发，类似于postrender方法
-app.fn.on('after', function(thisApp){
-	// your code
-});
 
 module.exports = app;
 ```

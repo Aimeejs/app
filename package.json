@@ -1,27 +1,29 @@
 {
-	"name": "app",
-	"description": "Aimeejs的app模块",
-	"main": "app.js",
-	"version": "1.0.0",
-	"scripts": {
-		"test": "uz -v"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/gavinning/aimee-app.git"
-	},
-	"keywords": [
-		"aimee-app",
-		"aimee",
-		"uz"
-	],
-	"author": "gavinning",
-	"license": "GPL-3.0",
-	"bugs": {
-		"url": "https://github.com/gavinning/aimee-app/issues"
-	},
-	"homepage": "https://github.com/gavinning/aimee-app",
-	"dependencies": {
-		"aimee": "^1.0.0"
-	}
+    "name": "app",
+    "aimee": "app",
+    "version": "1.0.0",
+    "description": "Aimeejs的app模块",
+    "main": "app.js",
+    "scripts": {
+        "test": "uz -v"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Aimeejs/app.git"
+    },
+    "keywords": [
+        "app",
+        "aimee",
+        "aimee-app",
+        "uz"
+    ],
+    "author": "gavinning",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/Aimeejs/app/issues"
+    },
+    "homepage": "https://github.com/Aimeejs/app",
+    "dependencies": {
+        "aimee": "^1.0.0"
+    }
 }
