@@ -141,8 +141,15 @@ App.fn.extend({
 
     // 获取mock模拟数据
     getMockData: function(){
+        var data;
         var mock = require('mock').mock;
-        var data = require(this.name + '/' + this.name + '.json');
+
+        try{
+            data = require(this.name + '/' + this.name + '.json');
+        }catch(e){
+            data = {};
+        }
+
         return mock(data);
     },
 
