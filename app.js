@@ -22,7 +22,10 @@ EventMaps = ('blur focus focusin focusout load resize scroll unload click dblcli
 
 App.fn.extend({
     renderString: 'lincoapp-id-',
-    guid: aimee.guid()
+    guid: aimee.guid(),
+    aimee: {
+        app: true
+    }
 });
 
 App.extend({
