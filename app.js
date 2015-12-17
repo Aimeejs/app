@@ -18,6 +18,7 @@ types = ['before', 'after', 'data'];
 // EventMaps
 EventMaps = ('blur focus focusin focusout load resize scroll unload click dblclick ' +
     'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
+    'webkitAnimationEnd webkitTransitionEnd animationEnd transitionEnd ' +
     'change select submit keydown keypress keyup error contextmenu').split(' ');
 
 App.fn.extend({
@@ -168,7 +169,7 @@ App.fn.extend({
 
     // 返回所属页面jQuery对象
     getPage: function(){
-        return this.page._page;
+        return this.page ? this.page._page : $();
     },
 
     // 设置模块皮肤
