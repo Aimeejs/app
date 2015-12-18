@@ -1,3 +1,8 @@
+v1.0.4
+---
+fix bug: 解决全局模块不能正常渲染的问题
+
+优化app.getPage方法，处理app.page不存在的情况
 v1.0.3
 ---
 优化app.getPage方法，处理app.page不存在的情况

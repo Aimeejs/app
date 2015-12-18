@@ -169,7 +169,7 @@ App.fn.extend({
 
     // 返回所属页面jQuery对象
     getPage: function(){
-        return this.page ? this.page._page : $();
+        return this.page ? this.page._page : false;
     },
 
     // 设置模块皮肤
