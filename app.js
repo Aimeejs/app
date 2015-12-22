@@ -89,7 +89,7 @@ App.extend({
     // 组件渲染预处理，内部使用
     __prerender: function(){
         // 预处理需要添加到thisApp上的属性
-        app.__attr ? app.attr(app.__attr) : '';
+        app.__attr ? app.getApp().attr(app.__attr) : '';
     },
 
     // 组件渲染后处理，内部使用
@@ -119,22 +119,35 @@ App.extend({
         app.__EventMap.after.forEach(function(fn){
             fn(app)
         });
+    },
+
+    // 合并指定Zepto对象的 id、class
+    merge: function(target, source){
+        target.attr('id', source.attr('id'));
+        target.addClass(source.attr('class'));
     }
 });
 
 App.fn.extend({
     init: function(data, noMock){
-        this.compile(data, noMock);
+        // 缓存App实例
+        app = this;
+        // 初始化App数据
+        this._data = noMock ? (data || {}) : App.data(data);
+        this._noMock = noMock;
+        // 构建临时Zepto对象，App编译前skin、addClass等操作将作用于此
+        this.__app = $(document.createElement('div'));
         return this;
     },
 
-    // 执行数据模板编译
-    compile: function(data, noMock){
-        app = this;
-        // 缓存数据
-        this._data = noMock ? data : App.data(data);
-        // 缓存app.jquery对象
+    // 编译数据并缓存App Zepto对象
+    compile: function(){
+        // Compile
         this._app = $(this.template(this.getData()));
+        // Merge id, className
+        App.merge(this._app, this.__app);
+        // Clear tmp Zepto
+        this.__app = null;
         return this;
     },
 
@@ -159,12 +172,7 @@ App.fn.extend({
 
     // 返回模块jQuery对象
     getApp: function(){
-        return this._app;
-    },
-
-    // TODO：新版本废弃此API
-    setPage: function(page){
-        return this;
+        return this._app || this.__app;
     },
 
     // 返回所属页面jQuery对象
@@ -176,30 +184,9 @@ App.fn.extend({
     skin: function(className){
         if(className)
             className.split(' ').forEach(function(item){
-                this.addClass('skin-' + item)
-            }.bind(this))
-
-        return this;
-    },
-
-    // 设置模块属性
-    attr: function(key, value){
-        if(!value){
-            return this.getApp().attr(key);
-        }
-        else{
-            this.getApp().attr(key, value);
+                app.addClass('skin-' + item)
+            })
             return this;
-        }
-    },
-
-    setId: function(id){
-        this.getApp().attr('id', id);
-        return this;
-    },
-
-    getId: function(){
-        return this.getApp().attr('id');
     },
 
     addClass: function(className){
@@ -213,6 +200,7 @@ App.fn.extend({
     },
 
     render: function(id){
+        this.compile();
         App.render(id);
         return this;
     },
@@ -275,6 +263,7 @@ App.fn.extend({
     config: function(config){
         if(config){
             this._config = this.extend({}, this._config, config);
+            this._data.config = this._config;
         return this;
         }
         else{
