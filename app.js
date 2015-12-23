@@ -134,6 +134,7 @@ App.fn.extend({
         app = this;
         // 初始化App数据
         this._data = noMock ? (data || {}) : App.data(data);
+        this._data.config = this._config = {};
         this._noMock = noMock;
         // 构建临时Zepto对象，App编译前skin、addClass等操作将作用于此
         this.__app = $(document.createElement('div'));

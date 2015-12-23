@@ -1,3 +1,7 @@
+v1.0.6
+---
+fix bug, ```app.init```中初始化app._config, app._data.config，解决模板中调用config.method报错的问题
+
 v1.0.5
 ---
 * 优化App编译时机，由```app.init```时编译更改为```app.render```时编译，在```app.render```之前对data的更新都将有效反应到模板中，从此```app.config```可对app模板产生影响，如果只需要编译而不需要render可以直接执行```app.init().compile()```即可
