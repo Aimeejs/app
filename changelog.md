@@ -1,3 +1,8 @@
+v1.0.7
+---
+fix bug, 解决app.exports方法内app调用的bug
+
+
 v1.0.6
 ---
 fix bug, ```app.init```中初始化app._config, app._data.config，解决模板中调用config.method报错的问题

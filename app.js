@@ -363,7 +363,7 @@ App.fn.extend({
         app.pm = this.pm;
 
         // 没有回调时自动渲染，仅用于开发测试环境
-        fn ? fn.call(app, app) : app.init().setPage(thisPage).render();
+        fn ? fn.call(app, app) : app.init().render();
 
         if(!fn){
             return app;
