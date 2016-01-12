@@ -1,7 +1,6 @@
 {
     "name": "app",
-    "aimee": "app",
-    "version": "1.0.7",
+    "version": "1.0.9",
     "description": "Aimeejs的app模块",
     "main": "app.js",
     "scripts": {

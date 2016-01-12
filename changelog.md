@@ -1,7 +1,10 @@
+v1.0.8 - v1.0.9
+---
+Update readme.md
+
 v1.0.7
 ---
 fix bug, 解决app.exports方法内app调用的bug
-
 
 v1.0.6
 ---
@@ -17,7 +20,7 @@ app.init(data).config({foo: "bar"}).render()
 ```jade
 // In app.jade
 if(config.foo)
-	.title #{config.foo}
+    .title #{config.foo}
 ```
 * 废弃```app.attr```
 * 废弃```app.setId```
