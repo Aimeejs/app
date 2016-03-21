@@ -4,157 +4,112 @@
  * Homepage https://github.com/Aimeejs/app
  */
 
-var app, App, aimee, config, Class, types, EventMaps;
+var App, app, private, guid, aimee, Class, zeptoArray;
 
+guid = require('guid');
 aimee = require('aimee');
-config = aimee.getConfig();
-Class = aimee.Class;
+Class = require('class');
+App = module.exports = Class.create();
 
-App = Class.create();
-App.version = '1.0.0';
-
-// 事件类型
-types = ['before', 'after', 'data'];
-// EventMaps
-EventMaps = ('blur focus focusin focusout load resize scroll unload click dblclick ' +
-    'mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave ' +
-    'webkitAnimationEnd webkitTransitionEnd animationEnd transitionEnd ' +
-    'change select submit keydown keypress keyup error contextmenu').split(' ');
-
-App.fn.extend({
-    renderString: 'lincoapp-id-',
-    guid: aimee.guid(),
-    aimee: {
-        app: true
+// Method Extend From Zepto
+zeptoArray = ('show hide on off delegate undelegate addClass removeClass ' +
+             'append prepend').split(' ');
+zeptoArray.forEach(function(name){
+    App.fn[name] = function(){
+        $.fn[name].apply(this.getApp(), arguments)
+        return this;
     }
-});
+})
 
-App.extend({
+// 非开放de私有方法
+private = {
 
-   // 返回组合数据
-    data: function(data){
-        // 无数据默认返回MockData
-        if(!data){
-            return app.getMockData();
-        }
-
-        // 非Map类型直接返回
-        if(!$.isPlainObject(data)){
-            return data;
-        }
-
-        // data && $.isPlainObject(data) &
-        if(config.env === 'mock' || config.env === 'mockjs'){
-            return $.extend(app.getMockData(), data)
-        }
-
-        return data;
+    // 返回支持Mock的数据
+    getData: function(app, data){
+        return data && !$.isPlainObject(data) ?
+            app.getMockData() : $.extend(app.getMockData(), data);
     },
 
-    // 返回renderId
-    renderId: function(){
+    // 获取app的renderId
+    getRenderId: function(app){
         return app.renderString + app.name;
     },
 
-    // 执行模块渲染
-    render: function(id, type){
-        if(!id || $.isPlainObject(id)){
-            id = '#' + App.renderId();
-        };
+    // 支持app.render
+    render: function(app, id, type){
+        id = id || '#' + this.getRenderId(app);
 
-        // 渲染前预处理
-        this.prerender(this);
+        this.prerender(app);
 
-        if(!type){
-            // 执行渲染
-            app.getPage() ?
-                app.getPage().find(id).eq(0).replaceWith(app.getApp()): // this.getApp() || this.html(data)
-                $(id).replaceWith(app.getApp());
-        }
+        // 执行渲染
+        app.getPage() ?
+            app.getPage().find(id).eq(0).replaceWith(app.getApp()):
+            $(id).replaceWith(app.getApp());
 
-        // 后置插入到指定id
-        if(type === 'appendTo'){
-            $(id).append(app.getApp());
-        }
-
-        // 前置插入到指定id
-        if(type === 'prependTo'){
-            $(id).prepend(app.getApp());
-        }
-
-        // 渲染后处理
-        this.postrender(this);
+        this.postrender(app)
     },
 
-    // 组件渲染预处理，内部使用
-    __prerender: function(){
+    // 支持app预处理
+    prerender: function(app){
+        app.include(app);
+        app.prerender(app);
         // 预处理需要添加到thisApp上的属性
         app.__attr ? app.getApp().attr(app.__attr) : '';
     },
 
-    // 组件渲染后处理，内部使用
-    __postrender: function(){
-
-    },
-
-    // 组件渲染之预处理
-    prerender: function(){
-        this.__prerender(app);
-        app.include(app);
-        app.prerender(app);
-        !app.__EventMap ||
-        !app.__EventMap.before ||
-        app.__EventMap.before.forEach(function(fn){
-            fn(app)
-        });
-    },
-
-    // 组件渲染之后处理
-    postrender: function(){
-        this.__postrender(app);
+    // 支持app后处理
+    postrender: function(app){
         app.bind(app);
         app.postrender(app);
-        !app.__EventMap ||
-        !app.__EventMap.after ||
-        app.__EventMap.after.forEach(function(fn){
-            fn(app)
-        });
     },
 
     // 合并指定Zepto对象的 id、class
     merge: function(target, source){
+        if(!source){
+            return
+        }
         target.attr('id', source.attr('id'));
         target.addClass(source.attr('class'));
     }
-});
+}
 
-App.fn.extend({
-    init: function(data, noMock){
-        // 缓存App实例
-        app = this;
+// Base
+App.include({
+    guid: guid(),
+    renderString: 'lincoapp-id-',
+    aimee: {app: true}
+})
+
+// Core
+App.include({
+
+    init: function(data){
         // 初始化App数据
-        this._data = noMock ? (data || {}) : App.data(data);
-        this._data.config = this._config = {};
-        this._noMock = noMock;
+        !$.isEmptyObject(data) ?
+            this._data = data :
+            this._data = this.getMockData();
+
+        // 检查默认数据是存在config
+        this._data.config ?
+            // 存在则直接赋值
+            this._config = this._data.config:
+            // 不存在则初始化
+            this._data.config = this._config = {};
+
         // 构建临时Zepto对象，App编译前skin、addClass等操作将作用于此
-        this.__app = $(document.createElement('div'));
+        this.__app = aimee.$('div');
         return this;
     },
 
     // 编译数据并缓存App Zepto对象
-    compile: function(){
+    compile: function(data){
         // Compile
-        this._app = $(this.template(this.getData()));
+        this._app = $(this.template(data || this.getData()));
         // Merge id, className
-        App.merge(this._app, this.__app);
+        private.merge(this._app, this.__app);
         // Clear tmp Zepto
         this.__app = null;
         return this;
-    },
-
-    // 获取来自页面的数据
-    getData: function(){
-        return this._data;
     },
 
     // 获取mock模拟数据
@@ -164,11 +119,23 @@ App.fn.extend({
 
         try{
             data = require(this.name + '/' + this.name + '.json');
-        }catch(e){
-            data = {};
+        }
+        catch(e){
+            // 虚拟组件可自由定制数据
+            data = this._data || {};
         }
 
         return mock(data);
+    },
+
+    // 获取来自页面的数据
+    getData: function(){
+        return this._data || this.getMockData();
+    },
+
+    setData: function(data){
+        this._data = data;
+        return this;
     },
 
     // 返回模块jQuery对象
@@ -176,59 +143,63 @@ App.fn.extend({
         return this._app || this.__app;
     },
 
+    setApp: function($dom){
+        this._app = $dom;
+        return this;
+    },
+
     // 返回所属页面jQuery对象
     getPage: function(){
         return this.page ? this.page._page : false;
     },
 
-    // 设置模块皮肤
-    skin: function(className){
-        if(className)
-            className.split(' ').forEach(function(item){
-                app.addClass('skin-' + item)
-            })
-            return this;
-    },
-
-    addClass: function(className){
-        this.getApp().addClass(className);
-        return this;
-    },
-
-    removeClass: function(className){
-        this.getApp().removeClass(className);
-        return this;
-    },
-
     render: function(id){
         this.compile();
-        App.render(id);
+        private.render(this, id);
         return this;
     },
 
-    append: function(obj){
-        this.getApp().append(obj);
+    // 重载
+    reload: function(inherit, data){
+        if($.isPlainObject(inherit)){
+            data = inherit;
+            inherit = false;
+        }
+
+        !inherit ?
+            data :
+            data = $.extend(true, {}, this.getData(), data);
+
+        this.compile(data)
+
         return this;
     },
 
-    prepend: function(obj){
-        this.getApp().prepend(obj);
-        return this;
-    },
+    // 传入配置文件
+    config: function(key, value){
+        var _config = {};
 
-    appendTo: function(id){
-        App.render(id, 'appendTo');
-        return this;
-    },
+        if(value && typeof key === 'string'){
+            _config[key] = value;
+            this.extend(this._config, _config);
+            return this;
+        }
 
-    prependTo: function(id){
-        App.render(id, 'prependTo');
+        if(!value && $.isPlainObject(key)){
+            this._config = this.extend({}, this._config, key);
+            this._data.config = this._config;
         return this;
-    },
+        }
 
-    find: function(selector){
-        return this.getApp().find(selector);
-    },
+        if(!key){
+            this._config ? '' : this._config = {};
+            return this._config;
+        }
+    }
+})
+
+// Rewrite
+App.include({
 
     // 标准扩展处理
     include: function(app){
@@ -253,65 +224,35 @@ App.fn.extend({
     // 标准事件绑定处理
     bind: function(app){
         return this;
-    },
+    }
+})
 
-    delegate: function(el, type, fn){
-        this.getApp().delegate(el, type, fn);
+// Supplementary
+App.include({
+    // 设置模块皮肤
+    skin: function(className){
+        var it = this;
+
+        if(className)
+            className.split(' ').forEach(function(item){
+                it.addClass('skin-' + item)
+            })
         return this;
     },
 
-    // 传入配置文件
-    config: function(config){
-        if(config){
-            this._config = this.extend({}, this._config, config);
-            this._data.config = this._config;
-        return this;
-        }
-        else{
-            this._config ? '' : this._config = {};
-            return this._config;
-        }
+    // 删除模块皮肤
+    removeSkin: function(className){
+        var it = this;
+
+        if(className)
+            className.split(' ').forEach(function(item){
+                it.removeClass('skin-' + item)
+            })
+            return this;
     },
 
-    // 监听事件
-    on: function(id, fn){
-        // 转发给底层框架处理
-        // if(types.indexOf(id) < 0){
-        if(EventMaps.indexOf(id) >= 0){
-            this.getApp().on(id, fn);
-            return this;
-
-        // 自处理types内的事件类型
-        } else {
-            this.__EventMap ? '' : this.__EventMap = {};
-            this.__EventMap[id] ? '' : this.__EventMap[id] = [];
-            this.__EventMap[id].push(fn);
-            return this;
-        }
-    },
-
-    fire: function(id){
-        var args = [].slice.call(arguments, 1);
-        this.__EventMap ? '' : this.__EventMap = {};
-        this.__EventMap[id] ? '' : this.__EventMap[id] = [];
-        this.__EventMap[id].forEach(function(fn){
-            fn.apply(app, args)
-        })
-        return this;
-    },
-
-    // 取消监听
-    off: function(id){
-        // 转发给底层框架处理
-        if(types.indexOf(id) < 0){
-            this.getApp().off(id);
-            return this;
-
-        // 自处理types内的事件类型
-        } else {
-            this.__EventMap[id] = [];
-            return this;
-        }
+    find: function(selector){
+        return this.getApp().find(selector);
     },
 
     export: function(App, fn){
@@ -384,7 +325,4 @@ App.fn.extend({
             }
         }
     }
-
 });
-
-module.exports = App;

@@ -1,6 +1,6 @@
 {
     "name": "app",
-    "version": "1.0.9",
+    "version": "2.0.0-beta1",
     "description": "Aimeejs的app模块",
     "main": "app.js",
     "scripts": {
@@ -23,6 +23,7 @@
     },
     "homepage": "https://github.com/Aimeejs/app",
     "dependencies": {
-        "aimee": "^1.0.0"
+        "class": "^1.0.0",
+        "guid": "^1.0.0"
     }
 }

@@ -1,17 +1,17 @@
 # App
+可以基于此创建Widget App
 
-Aimee框架的app模块，所有Widget App组件依赖此模块创建  
+#### 什么是Widget App
 
 #### 目录结构
 ```
-// widget.app由数个基本文件组成
 nav
-├── nav.jade            // 可选，app的jade模板，构建过程中会被编译成amd模块
+├── nav.jade            // 可选，app的jade模板
 ├── nav.js              // 可选，app功能js文件
-├── nav.json.js         // 可选，app模拟数据，基于mock规则，仅用于测试
+├── nav.json.js         // 可选，app模拟数据，基于mock规则
 ├── nav.less            // 可选，app的样式文件
 ├── aimee.json          // 必须，app描述文件
-├──                     // 可选，app的其他文件，会被构建工具过滤
+├──                     // 可选，app的其他文件
 └── img                 // 可选，app的媒体文件夹
 ```
 
