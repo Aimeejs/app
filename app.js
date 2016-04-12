@@ -148,6 +148,11 @@ App.include({
         return this;
     },
 
+    setPage: function(page){
+        this.page = page;
+        return this;
+    },
+
     // 返回所属页面jQuery对象
     getPage: function(){
         return this.page ? this.page._page : false;
