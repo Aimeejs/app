@@ -1,13 +1,22 @@
 # App
 可以基于此创建Widget App
 
-#### 什么是Widget App
-
-#### 目录结构
+#### 标准目录结构
 ```
 nav
 ├── nav.jade            // 可选，app的jade模板
 ├── nav.js              // 可选，app功能js文件
+├── nav.json.js         // 可选，app模拟数据，基于mock规则
+├── nav.less            // 可选，app的样式文件
+├── aimee.json          // 必须，app描述文件
+├──                     // 可选，app的其他文件
+└── img                 // 可选，app的媒体文件夹
+```
+#### ES6目录结构
+```
+nav
+├── nav.jade            // 可选，app的jade模板
+├── nav.es6             // 可选，app功能es6文件
 ├── nav.json.js         // 可选，app模拟数据，基于mock规则
 ├── nav.less            // 可选，app的样式文件
 ├── aimee.json          // 必须，app描述文件
@@ -21,6 +30,10 @@ nav
 $ aimee c -w app
 // or
 $ aimee create -w app
+
+// 创建es6模板
+$ aimee c -ew app
+$ aimee create -ew app
 ```
 
 #### 安装
