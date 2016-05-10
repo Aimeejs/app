@@ -13,7 +13,7 @@ App = module.exports = Class.create();
 
 // Method Extend From Zepto
 zeptoArray = ('show hide on off delegate undelegate addClass removeClass ' +
-             'append prepend').split(' ');
+             'append prepend appendTo prependTo').split(' ');
 zeptoArray.forEach(function(name){
     App.fn[name] = function(){
         $.fn[name].apply(this.getApp(), arguments)
