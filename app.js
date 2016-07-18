@@ -182,24 +182,31 @@ App.include({
 
     // 传入配置文件
     config: function(key, value){
-        var _config = {};
-
+        // key && value :: set
         if(value && typeof key === 'string'){
-            _config[key] = value;
-            this.extend(this._config, _config);
+            this._config[key] = value;
             return this;
         }
 
+        // key is object :: set
         if(!value && $.isPlainObject(key)){
             this._config = this.extend({}, this._config, key);
             this._data.config = this._config;
-        return this;
+            return this;
         }
 
+        // !value & key :: get
+        if(!value && typeof(key) === 'string'){
+            return this._config[key]
+        }
+
+        // !key & !value :: get
         if(!key){
             this._config ? '' : this._config = {};
             return this._config;
         }
+
+        return this;
     }
 })
 
