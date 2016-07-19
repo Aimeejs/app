@@ -4,7 +4,7 @@
  * Homepage https://github.com/Aimeejs/app
  */
 
-var App, app, private, guid, aimee, Class, zeptoArray;
+var App, app, privates, guid, aimee, Class, zeptoArray;
 
 guid = require('guid');
 aimee = require('aimee');
@@ -22,7 +22,7 @@ zeptoArray.forEach(function(name){
 })
 
 // 非开放de私有方法
-private = {
+privates = {
 
     // 返回支持Mock的数据
     getData: function(app, data){
@@ -106,7 +106,7 @@ App.include({
         // Compile
         this._app = $(this.template(data || this.getData()));
         // Merge id, className
-        private.merge(this._app, this.__app);
+        privates.merge(this._app, this.__app);
         // Clear tmp Zepto
         this.__app = null;
         return this;
@@ -160,7 +160,7 @@ App.include({
 
     render: function(id){
         this.compile();
-        private.render(this, id);
+        privates.render(this, id);
         return this;
     },
 
