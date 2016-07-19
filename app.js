@@ -4,39 +4,27 @@
  * Homepage https://github.com/Aimeejs/app
  */
 
-var App, app, privates, guid, aimee, Class, zeptoArray;
+let zeptoArray;
 
-guid = require('guid');
-aimee = require('aimee');
-Class = require('class');
-App = module.exports = Class.create();
-
-// Method Extend From Zepto
-zeptoArray = ('show hide on off delegate undelegate addClass removeClass ' +
-             'append prepend appendTo prependTo').split(' ');
-zeptoArray.forEach(function(name){
-    App.fn[name] = function(){
-        $.fn[name].apply(this.getApp(), arguments)
-        return this;
-    }
-})
+import guid from 'guid';
+import Base from 'class';
+import Config from 'config';
 
 // 非开放de私有方法
-privates = {
-
+class Privates {
     // 返回支持Mock的数据
-    getData: function(app, data){
+    getData(app, data) {
         return data && !$.isPlainObject(data) ?
             app.getMockData() : $.extend(app.getMockData(), data);
-    },
+    }
 
     // 获取app的renderId
-    getRenderId: function(app){
+    getRenderId(app) {
         return app.renderString + app.name;
-    },
+    }
 
     // 支持app.render
-    render: function(app, id, type){
+    render(app, id, type) {
         id = id || '#' + this.getRenderId(app);
 
         this.prerender(app);
@@ -47,24 +35,24 @@ privates = {
             $(id).replaceWith(app.getApp());
 
         this.postrender(app)
-    },
+    }
 
     // 支持app预处理
-    prerender: function(app){
+    prerender(app) {
         app.include(app);
         app.prerender(app);
         // 预处理需要添加到thisApp上的属性
         app.__attr ? app.getApp().attr(app.__attr) : '';
-    },
+    }
 
     // 支持app后处理
-    postrender: function(app){
+    postrender(app) {
         app.bind(app);
         app.postrender(app);
-    },
+    }
 
     // 合并指定Zepto对象的 id、class
-    merge: function(target, source){
+    merge(target, source) {
         if(!source){
             return
         }
@@ -73,17 +61,21 @@ privates = {
     }
 }
 
-// Base
-App.include({
-    guid: guid(),
-    renderString: 'lincoapp-id-',
-    aimee: {app: true}
-})
+let privates = new Privates;
 
-// Core
-App.include({
+class App extends Base {
 
-    init: function(data){
+    constructor() {
+        super();
+        this.guid = guid();
+        this.aimee = { app: true };
+        this.renderString: 'lincoapp-id-';
+        this._config = {};
+        this.CONFIG = new Config;
+        this.CONFIG.init(this._config);
+    }
+
+    init(data) {
         // 初始化App数据
         !$.isEmptyObject(data) ?
             this._data = data :
@@ -99,10 +91,10 @@ App.include({
         // 构建临时Zepto对象，App编译前skin、addClass等操作将作用于此
         this.__app = aimee.$('div');
         return this;
-    },
+    }
 
     // 编译数据并缓存App Zepto对象
-    compile: function(data){
+    compile(data) {
         // Compile
         this._app = $(this.template(data || this.getData()));
         // Merge id, className
@@ -110,10 +102,10 @@ App.include({
         // Clear tmp Zepto
         this.__app = null;
         return this;
-    },
+    }
 
     // 获取mock模拟数据
-    getMockData: function(){
+    getMockData() {
         var data;
         var mock = require('mock').mock;
 
@@ -126,46 +118,46 @@ App.include({
         }
 
         return mock(data);
-    },
+    }
 
     // 获取来自页面的数据
-    getData: function(){
+    getData() {
         return this._data || this.getMockData();
-    },
+    }
 
-    setData: function(data){
+    setData(data) {
         this._data = data;
         return this;
-    },
+    }
 
     // 返回模块jQuery对象
-    getApp: function(){
+    getApp() {
         return this._app || this.__app;
-    },
+    }
 
-    setApp: function($dom){
+    setApp($dom) {
         this._app = $dom;
         return this;
-    },
+    }
 
-    setPage: function(page){
+    setPage(page) {
         this.page = page;
         return this;
-    },
+    }
 
     // 返回所属页面jQuery对象
-    getPage: function(){
+    getPage() {
         return this.page ? this.page._page : false;
-    },
+    }
 
-    render: function(id){
+    render(id) {
         this.compile();
         privates.render(this, id);
         return this;
-    },
+    }
 
     // 重载
-    reload: function(inherit, data){
+    reload(inherit, data) {
         if($.isPlainObject(inherit)){
             data = inherit;
             inherit = false;
@@ -178,71 +170,16 @@ App.include({
         this.compile(data)
 
         return this;
-    },
+    }
 
     // 传入配置文件
-    config: function(key, value){
-        // key && value :: set
-        if(value && typeof key === 'string'){
-            this._config[key] = value;
-            return this;
-        }
-
-        // key is object :: set
-        if(!value && $.isPlainObject(key)){
-            this._config = this.extend({}, this._config, key);
-            this._data.config = this._config;
-            return this;
-        }
-
-        // !value & key :: get
-        if(!value && typeof(key) === 'string'){
-            return this._config[key]
-        }
-
-        // !key & !value :: get
-        if(!key){
-            this._config ? '' : this._config = {};
-            return this._config;
-        }
-
+    config() {
+        this.CONFIG.general.apply(this.CONFIG, arguments);
         return this;
     }
-})
 
-// Rewrite
-App.include({
-
-    // 标准扩展处理
-    include: function(app){
-        return this;
-    },
-
-    // 标准预处理
-    prerender: function(app){
-        return this;
-    },
-
-    // 标准后处理
-    postrender: function(app){
-        return this;
-    },
-
-    // 页面渲染后，被覆盖
-    pagerender: function(){
-
-    },
-
-    // 标准事件绑定处理
-    bind: function(app){
-        return this;
-    }
-})
-
-// Supplementary
-App.include({
     // 设置模块皮肤
-    skin: function(className){
+    skin(className) {
         var it = this;
 
         if(className)
@@ -250,10 +187,10 @@ App.include({
                 it.addClass('skin-' + item)
             })
         return this;
-    },
+    }
 
     // 删除模块皮肤
-    removeSkin: function(className){
+    removeSkin(className) {
         var it = this;
 
         if(className)
@@ -261,13 +198,13 @@ App.include({
                 it.removeClass('skin-' + item)
             })
             return this;
-    },
+    }
 
-    find: function(selector){
+    find(selector) {
         return this.getApp().find(selector);
-    },
+    }
 
-    export: function(App, fn){
+    _export(App, fn) {
         var thisPage;
         var app = new App;
         this.app ? '' : this.app = {};
@@ -321,9 +258,9 @@ App.include({
         if(!fn){
             return app;
         }
-    },
+    }
 
-    exports: function(id, fn){
+    exports(id, fn) {
         // id === string
         if(typeof id === 'string'){
             // 多个组件调用，返回page对象
@@ -333,8 +270,47 @@ App.include({
             }
             // 单个组件调用返回app对象
             else{
-                return this.export(require(id), fn);
+                return this._export(require(id), fn);
             }
         }
     }
-});
+
+    // Rewrite
+
+    // 标准扩展处理
+    include(app) {
+        return this;
+    }
+
+    // 标准预处理
+    prerender(app) {
+        return this;
+    }
+
+    // 标准后处理
+    postrender(app) {
+        return this;
+    }
+
+    // 页面渲染后，被覆盖
+    pagerender() {
+
+    }
+
+    // 标准事件绑定处理
+    bind(app) {
+        return this;
+    }
+}
+
+// Method Extend From Zepto
+zeptoArray = ('show hide on off delegate undelegate addClass removeClass ' +
+             'append prepend appendTo prependTo').split(' ')
+zeptoArray.forEach(function(name){
+    App.fn[name] = function() {
+        $.fn[name].apply(this.getApp(), arguments)
+        return this;
+    }
+})
+
+export default App;

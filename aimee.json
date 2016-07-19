@@ -23,7 +23,7 @@
     },
     "homepage": "https://github.com/Aimeejs/app",
     "dependencies": {
-        "class": "^1.0.0",
-        "guid": "^1.0.0"
+        "guid": "^1.0.0",
+        "class": "^1.0.0"
     }
 }

@@ -1,3 +1,12 @@
+v2.0.0
+---
+* => ES6
+* 恢复``setPage``方法，用于直接调用app时快捷设置渲染页面
+* 继承底层框架``(Zepto|jQuery)``部分方法
+``show hide on off delegate undelegate addClass removeClass append prepend appendTo prependTo``
+* 修改保留关键字``private => privates``
+* 重写``config``方法
+
 v1.0.8 - v1.0.9
 ---
 Update readme.md
