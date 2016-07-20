@@ -69,7 +69,7 @@ class App extends Base {
         super();
         this.guid = guid();
         this.aimee = { app: true };
-        this.renderString: 'lincoapp-id-';
+        this.renderString = 'lincoapp-id-';
         this._config = {};
         this.CONFIG = new Config;
         this.CONFIG.init(this._config);
@@ -305,9 +305,9 @@ class App extends Base {
 
 // Method Extend From Zepto
 zeptoArray = ('show hide on off delegate undelegate addClass removeClass ' +
-             'append prepend appendTo prependTo').split(' ')
+             'before after append prepend appendTo prependTo').split(' ')
 zeptoArray.forEach(function(name){
-    App.fn[name] = function() {
+    App.prototype[name] = function() {
         $.fn[name].apply(this.getApp(), arguments)
         return this;
     }
