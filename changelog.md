@@ -1,3 +1,7 @@
+v2.0.2
+---
+Fixbug 修正``app.config``方法
+
 v2.0.1
 ---
 补齐``App.aimee``标记

@@ -174,8 +174,7 @@ class App extends Base {
 
     // 传入配置文件
     config() {
-        this.CONFIG.general.apply(this.CONFIG, arguments);
-        return this;
+        return this.CONFIG.general.apply(this.CONFIG, arguments) || this;
     }
 
     // 设置模块皮肤
