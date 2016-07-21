@@ -303,6 +303,8 @@ class App extends Base {
     }
 }
 
+App.aimee = { app: true }
+
 // Method Extend From Zepto
 zeptoArray = ('show hide on off delegate undelegate addClass removeClass ' +
              'before after append prepend appendTo prependTo').split(' ')

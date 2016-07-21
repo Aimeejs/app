@@ -1,6 +1,6 @@
 {
     "name": "app",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Aimeejs的app模块",
     "main": "app.js",
     "scripts": {
