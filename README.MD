@@ -49,10 +49,36 @@ class Footer extends App {
         this.template = template;
     }
 
+    onload() {
+        var data = this.getData()
+    }
+
     // app渲染到页面之前执行，用于预处理渲染内容
     prerender(app) {
+
+        // this === app
+        console.log(this === app) // => true
+
         // app为模块的实例
         app.find('li').eq(0).addClass('selected');
+
+        this.bind({
+
+            // 为app根对象绑定事件
+            'click': () => {
+                console.log('click app')
+            },
+
+            // 为app下的li绑定事件
+            'click@li': () => {
+                console.log('click li')
+            },
+
+            // 多事件绑定
+            'click, focus@input[type="text"]': () => {
+                console.log('click or focus input[type="text"]')
+            }
+        })
     }
 
     // app渲染到页面之后执行，此时app还在内存中，不能获取宽度高度等与尺寸相关的属性
@@ -105,10 +131,14 @@ exports.bar = function(){
 ```
 
 
-#### Use App
+### Use App
 ```js
 import App from 'app';
 
 let app = new App;
 app.foo();
 ```
+
+App工作流程
+---
+![App工作流程](test/workflow.png)

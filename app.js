@@ -39,7 +39,6 @@ class Privates {
 
     // 支持app预处理
     prerender(app) {
-        app.include(app);
         app.prerender(app);
         // 预处理需要添加到thisApp上的属性
         app.__attr ? app.getApp().attr(app.__attr) : '';
@@ -90,6 +89,7 @@ class App extends Base {
 
         // 构建临时Zepto对象，App编译前skin、addClass等操作将作用于此
         this.__app = aimee.$('div');
+        this.onload();
         return this;
     }
 
@@ -102,6 +102,57 @@ class App extends Base {
         // Clear tmp Zepto
         this.__app = null;
         return this;
+    }
+
+    /**
+     * 批量绑定事件
+     * @param   {Object}  events 事件对象模型
+     * @example
+     * this.bind({
+     * 		'click@.lincoapp-footer': () => {
+     * 			// do something
+     * 		}
+     * 		'click, focus@.lincoapp-comment': () => {
+     * 			// do something
+     * 		}
+     * })
+     */
+    bind(events) {
+        events = events || {};
+        $.each(events, (key, fn) => {
+            let pair = key.split('@');
+            let evts = pair[0].split(/,\s*/g);
+            evts.forEach((type) => {
+                this.on(type, pair[1], fn)
+            })
+        })
+    }
+
+    render(id) {
+        this.compile();
+        privates.render(this, id);
+        return this;
+    }
+
+    // 重载
+    reload(inherit, data) {
+        if($.isPlainObject(inherit)){
+            data = inherit;
+            inherit = false;
+        }
+
+        !inherit ?
+            data :
+            data = $.extend(true, {}, this.getData(), data);
+
+        this.compile(data)
+
+        return this;
+    }
+
+    // 传入配置文件
+    config() {
+        return this.CONFIG.general.apply(this.CONFIG, arguments) || this;
     }
 
     // 获取mock模拟数据
@@ -148,33 +199,6 @@ class App extends Base {
     // 返回所属页面jQuery对象
     getPage() {
         return this.page ? this.page._page : false;
-    }
-
-    render(id) {
-        this.compile();
-        privates.render(this, id);
-        return this;
-    }
-
-    // 重载
-    reload(inherit, data) {
-        if($.isPlainObject(inherit)){
-            data = inherit;
-            inherit = false;
-        }
-
-        !inherit ?
-            data :
-            data = $.extend(true, {}, this.getData(), data);
-
-        this.compile(data)
-
-        return this;
-    }
-
-    // 传入配置文件
-    config() {
-        return this.CONFIG.general.apply(this.CONFIG, arguments) || this;
     }
 
     // 设置模块皮肤
@@ -276,29 +300,24 @@ class App extends Base {
 
     // Rewrite
 
-    // 标准扩展处理
-    include(app) {
-        return this;
+    // 初始化后
+    onload(app) {
+        return this
     }
 
-    // 标准预处理
+    // 渲染预处理
     prerender(app) {
-        return this;
+        return this
     }
 
-    // 标准后处理
+    // 渲染后处理
     postrender(app) {
-        return this;
+        return this
     }
 
     // 页面渲染后，被覆盖
     pagerender() {
-
-    }
-
-    // 标准事件绑定处理
-    bind(app) {
-        return this;
+        return this
     }
 }
 
