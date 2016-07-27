@@ -46,7 +46,6 @@ class Privates {
 
     // 支持app后处理
     postrender(app) {
-        app.bind(app);
         app.postrender(app);
     }
 
