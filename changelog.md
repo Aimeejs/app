@@ -1,3 +1,10 @@
+v2.1.2
+---
+* 优化``init``方法，删除``this._config``对象，配置项交由``config.app``进行管理
+* 优化``render``方法，接受第二个参数作为``data``
+* 优化``compile``方法，为配合``reload``方法，编译前缓存上次渲染的对象
+* Fixbug 修正``reload``不能正确渲染到浏览器的问题
+
 v2.1.1
 ---
 * 删除app自身对``app.bind的``调用
