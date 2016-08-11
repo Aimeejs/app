@@ -30,8 +30,8 @@ class Privates {
         this.prerender(app);
 
         // 执行渲染
-        app.getPage() ?
-            app.getPage().find(id).eq(0).replaceWith(app.getApp()):
+        app.getParent() ?
+            app.getParent().find(id).eq(0).replaceWith(app.getApp()):
             $(id).replaceWith(app.getApp());
 
         this.postrender(app)
@@ -196,7 +196,11 @@ class App extends Base {
 
     // 返回所属页面jQuery对象
     getPage() {
-        return this.page ? this.page._page : false;
+        return this.page ? this.page._page : this.parent;
+    }
+
+    getParent() {
+        return this.parent ? this.parent: false;
     }
 
     // 设置模块皮肤
@@ -226,13 +230,13 @@ class App extends Base {
     }
 
     export(App, fn) {
-        var thisPage;
+        var data;
         var app = new App;
         this.app ? '' : this.app = {};
 
         // 用于简单调用模块，仅用于开发测试环境
         if(typeof fn === 'object'){
-            thisPage = fn;
+            data = fn;
             fn = null;
         };
 
@@ -274,7 +278,7 @@ class App extends Base {
         app.pm = this.pm;
 
         // 没有回调时自动渲染，仅用于开发测试环境
-        fn ? fn.call(app, app) : app.init().render();
+        fn ? fn.call(app, app) : app.init(data).render();
 
         if(!fn){
             return app;

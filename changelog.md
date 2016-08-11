@@ -1,3 +1,9 @@
+v2.1.3
+---
+* 新增``this.getParent``方法，返回其调用者
+* 优化``Privates.prototype.render``方法，父级查询方式更改为``this.getParent``
+* Fixbug 优化``this.export``方法，修正不能正确渲染数据的问题
+
 v2.1.2
 ---
 * 优化``init``方法，删除``this._config``对象，配置项交由``config.app``进行管理
