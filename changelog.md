@@ -1,3 +1,7 @@
+v2.1.4
+---
+* Fixbug 修正``config``方法对空值判断失误的问题，修正空值判断为``empty === undefined``
+
 v2.1.3
 ---
 * 新增``this.getParent``方法，返回其调用者

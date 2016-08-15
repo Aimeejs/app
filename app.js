@@ -150,7 +150,8 @@ class App extends Base {
 
     // 传入配置文件
     config() {
-        return this.CONFIG.general.apply(this.CONFIG, arguments) || this;
+        let val = this.CONFIG.general.apply(this.CONFIG, arguments);
+        return val === undefined ? this : val;
     }
 
     // 获取mock模拟数据
